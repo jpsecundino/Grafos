@@ -46,8 +46,11 @@ void join(int x, int y, int *p) {
     x = find(x, p);
     y = find(y, p);
 
-    if (x != y) {
+    if (x == y) return;
+    if (x < y) {
         p[y] = x;
+    } else {
+        p[x] = y;
     }
 }
 
