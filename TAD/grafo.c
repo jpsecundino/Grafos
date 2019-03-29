@@ -38,6 +38,50 @@ void graph_destroy(graph * g){
 	free(g);
 }
 
+int find(int x, int *p) {
+    return p[x] ? p[x] = find(p[x], p) : x;
+}
+
+void join(int x, int y, int *p) {
+    x = find(x, p);
+    y = find(y, p);
+
+    if (x != y) {
+        p[y] = x;
+    }
+}
+
+int graph_bridge(graph *g, int u, int v) {
+    if (u > v) {
+        int k = u;
+        u = v;
+        v = k;
+    }
+    int *p1 = calloc(N, sizeof(int));
+    int *p2 = calloc(N, sizeof(int));
+
+    for (int i = 0; i < N; i++) {
+        for (int j = i + 1; j < N; j++) {
+            if (g->mat[i][j] == 0) continue;
+            join(i, j, p1);
+            if (i != u || j != v) {
+                join(i, j, p2);
+            }
+        }
+    }
+
+    int b = 0;
+    for (int i = 1; i < 6; i++) {
+        if (find(i, p1) != find(i, p2)) {
+            b = 1;
+        }
+    }
+
+    free(p1);
+    free(p2);
+    return b;
+}
+
 int graph_fleury_rec(graph * g, int *p, int *i, int u, int start);
 
 int *graph_fleury(graph * g, int u) {
@@ -56,19 +100,22 @@ int *graph_fleury(graph * g, int u) {
 int graph_fleury_rec(graph * g, int *p, int *i, int u, int start) {
 	if (g->cnt_edge == 0) 
 		return u == start;
-	printf("%d\n", u);
-	for (int v = 0; v < N; v++) {
-		if (u == v || g->mat[u][v] == 0) 
-			continue;
-		int aux = g->mat[u][v];
-		graph_remove_edge(g, u, v);
-		p[(*i)++] = v;
-		int ok = graph_fleury_rec(g, p, i, v, start);
-		graph_add_edge(g, u, v, aux);
-		if (ok) 
-			return 1;
-		(*i)--;
-	}
+    for (int use_bridge = 0; use_bridge <= 1; use_bridge++) {
+        for (int v = 0; v < N; v++) {
+            if (u == v || g->mat[u][v] == 0)
+                continue;
+            if (!use_bridge && graph_bridge(g, u, v))
+                continue;
+            int aux = g->mat[u][v];
+            graph_remove_edge(g, u, v);
+            p[(*i)++] = v;
+            int ok = graph_fleury_rec(g, p, i, v, start);
+            graph_add_edge(g, u, v, aux);
+            if (ok) 
+                return 1;
+            (*i)--;
+        }
+    }
 	return 0;
 }
 
