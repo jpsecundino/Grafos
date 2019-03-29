@@ -76,7 +76,7 @@ void move(graph *g, int i, int j) {
 	} else {
 		j += signal(d_y);
 	}
-
+	
 	move(g, i, j);
 }
 
