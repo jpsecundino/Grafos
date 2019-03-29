@@ -34,6 +34,25 @@ int graph_get_edge(graph * g, int u, int v){
 	return g->mat[u][v];
 }
 
+int isPossible(graph *g){
+    int count_degree = 0;
+    
+    for (int i = 0; i < N; ++i){
+        
+        for( int j = 0; j < N; j++ ){
+            if(g->mat[i][j])
+                count_degree ++;
+        }
+        
+        if(count_degree%2 != 0)
+            return 0;
+        
+        count_degree = 0;
+    }
+
+    return 1;
+}
+
 void graph_destroy(graph * g){
 	free(g);
 }
