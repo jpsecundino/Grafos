@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "trie.h"
 
 // #define fileMAX 100
 #define nameMAX 20
 #define tagMAX 15
 #define SIZE_BUFFER 512
+#define SIZE_TAG 4
+#define WORD_MAX 600
 
 
 int isAceptedCharacter(char c){
@@ -47,7 +50,7 @@ int str_contains(char *str, char this){
 	return -1;
 }
 
-void clear_str(char *str){
+void clear_inconvenient_chars(char *str){
 
 	replaceChar(str, '*', ' ');
 	replaceChar(str, '/', ' ');
@@ -75,17 +78,24 @@ int has_ignored_symbols(char *str){
 	return (str[0] != '<' && str[0] != '.' && str[0] != ',' && str[0] != ';' && str[0] != '!' && str[0] != '?') ? 0 : 1;
 }
 
-int main(int argc, char const *argv[])
-{
-	char tag_list[tagMAX][3] = {"ADJ", "ADV", "CN", "GER", "PPT", "PPA", "IND", 
+int class_acepted(char tags[tagMAX][SIZE_TAG], char *class){
+	for( int i = 0; i < tagMAX; i++  ){
+		if(strcmp(class, tags[i]) == 0)
+			return 1;
+	}
+
+	return 0;
+}
+
+int main(int argc, char const *argv[]){
+
+	char tag_list[tagMAX][SIZE_TAG] = {"ADJ", "ADV", "CN", "GER", "PPT", "PPA", "IND", 
 								"INF", "MTH", "V", "WD", "STT", "QNT", "PRS", "PNM"};
 
 	FILE *txt_1/*, *txt_2*/;
 	char word[nameMAX];
 	char class[nameMAX];
 	char inconvenient;
-	// Node *vec_txt1 = (Node*) calloc(fileMAX, sizeof(Node));
-	// Node *vec_txt2 = (Node*) calloc(fileMAX, sizeof(Node));
 
 	// Inserir nome do primeiro texto
 	char file_name[nameMAX] = "sample.txt";
@@ -93,45 +103,50 @@ int main(int argc, char const *argv[])
 	scanf("%s", file_name);
 	txt_1 = fopen(file_name, "r");
 
-	// Inserir nome do segundo texto
-	// char file_name[nameMAX];
-	// scanf("%s", file_name);
-	// txt_2 = fopen(file_name, "r");
-
 	char buffer[SIZE_BUFFER];
 	int word_counter = 0;
 	
+	trie *t = create_trie();
+	char word_classes[WORD_MAX][nameMAX] = {};
+
 	while (!feof(txt_1)) {// fazer pros dois textos
 		fscanf(txt_1, "%s", buffer);
 	
 		if(!has_ignored_symbols(buffer)){		//ignora os sinais de pontuacao
-			word_counter++;
 
 			int slash_num = slash_counter(buffer);		// conta o número de barras
 
-			clear_str(buffer);				//limpa os caracteres indiferentes da string
+			clear_inconvenient_chars(buffer);				//limpa os caracteres indiferentes da string
 
 			// printf("%s\n", buffer);			//ative se quiser ver o buffer formatado
 
-			int i = 0;
+			int id = 0;
 			if(slash_num == 1) {
 				sscanf(buffer, "%s %s %*s", word, class);
-				printf("{%s, %s}\n", word, class );
 			} else if (slash_num == 2) {
 				sscanf(buffer, "%*s %s %s %*s", word, class);
 				if((inconvenient = str_contains(word, ',')) != -1){
 					word[inconvenient] = '\0';
 				}
-				printf("{%s, %s}\n", word, class);
 			}
 
-			printf("\n\n");
+			//adiciona palavra na trie se ela eh de uma das classes aceitaveis
+			if(class_acepted(tag_list, class)){
+					id = get_id(word, t);
+					strcpy(word_classes[id], class);
+					// printf("{%s, %s}\n", word, class );
+					printf("%s %s %s %d%d", word, word_classes[id], class, get_id(word, t), id );
+			}
+
+			if(id)
+				word_counter++;
+
 		}
 	}
 
+	trie_destroy(t);
+
 	fclose(txt_1);
-	// fclose(txt_2);
-	// free(buffer);
 
 	return 0;
 }
