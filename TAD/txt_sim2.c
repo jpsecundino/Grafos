@@ -89,7 +89,8 @@ int main(int argc, char const *argv[])
 
 	// Inserir nome do primeiro texto
 	char file_name[nameMAX] = "sample.txt";
-	// scanf("%s", file_name);
+	printf("Digite o nome do arquivo\n");
+	scanf("%s", file_name);
 	txt_1 = fopen(file_name, "r");
 
 	// Inserir nome do segundo texto
