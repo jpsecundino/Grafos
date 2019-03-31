@@ -1,8 +1,8 @@
 #include<stdlib.h>
 #include<string.h>
 #include<stdio.h>
-
-#define ALPHA_SIZE 26
+#include<locale.h>
+#define ALPHA_SIZE 58
 
 typedef struct _trie_node trie_node;
 
@@ -30,6 +30,17 @@ trie_node *create_node(int end_id){
 	return tn;
 }
 
+int return_index(unsigned char c){
+
+	if(( 96 < c && c < 123 )){
+		return c - 97;
+	}
+
+	if(  159 < c && c < 192 )
+		return c - 134;
+
+}
+
 trie *create_trie(){
 	trie *t = (trie *) calloc(1, sizeof(trie));
 
@@ -40,30 +51,29 @@ trie *create_trie(){
 	return t;
 }
 
-
-int get_id(char *word, trie *t){
-	
+int get_id(unsigned char *word, trie *t){
 	int word_size = strlen(word);
-
-	//to lower case
-	for (int i = 0; i < word_size; i++){
-		if((64 < word[i] && word[i] < 91))
-			word[i]+=32; 
-	}
 
 	int id = 0;
 
-	trie_node *n = t->root;	//actual node
-
+	trie_node *n = t->root;						//no atual
 	for( int i = 0; i < word_size; i++ ){
-		int pos = word[i] - 97;
+		int pos = 0;
 		
-		if(n->alphabet[pos] == NULL){	//if the caracter does not exist in the trie
+		if(word[i] == 195){					//se o caractere for especial
+			pos = return_index(word[i+1]);
+			i +=1;
+		}
+		else{
+			pos = return_index(word[i]);
+		}
+
+		if(n->alphabet[pos] == NULL){				//se o caractere ainda não existe na trie
 			n->alphabet[pos] = create_node(0);
 		}
 
 		if(i == word_size -1 && n->alphabet[pos]->end_id == 0)	//if its the last caracter of the word and no word ends here
-			n->alphabet[pos]->end_id = ++(t->last_id); //refresh the end id
+			n->alphabet[pos]->end_id = ++(t->last_id); 	//atualiza o end_id
 
 		id = n->alphabet[pos]->end_id;
 
