@@ -32,7 +32,7 @@ node *list_next(node *head) {
 }
 
 node_val list_val(node *head) {
-    return head ? head->val : (node_val) NULL;
+    return head ? head->val : (node_val) {.pointer = NULL};
 }
 
 void list_destroy(node *head) {
