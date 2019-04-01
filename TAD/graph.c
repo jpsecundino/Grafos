@@ -96,6 +96,8 @@ double graph_edge_similarity(graph *g1, graph *g2) {
             total_weight += MAX(g1_weights[j], g2_weights[j]);
         }
     }
+    free(g1_weights);
+    free(g2_weights);
     return common_weight / (double) total_weight;
 }
 
