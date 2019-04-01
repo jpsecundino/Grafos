@@ -165,7 +165,7 @@ int is_valid_class(char tags[tagMAX][SIZE_TAG], char *class){
 	return 0;
 }
 
-adj_array *file_pasing( char *file_name, unsigned char word_classes[WORD_MAX][nameMAX], trie *t ){
+adj_array *file_parsing( char *file_name, unsigned char word_classes[WORD_MAX][nameMAX], trie *t ){
 	unsigned char buffer[SIZE_BUFFER];
 	unsigned char word[nameMAX];
 	unsigned char class[nameMAX];
@@ -233,27 +233,24 @@ int main(int argc, char const *argv[]){
 	
 	printf("Digite o nome do primeiro arquivo\n");
 	scanf("%s", file_name);
-	adj_array *seq1 = file_pasing(file_name, word_classes, t);
+	adj_array *seq1 = file_parsing(file_name, word_classes, t);
 
 	printf("Digite o nome do segundo arquivo\n");
 	scanf("%s", file_name);
-	adj_array *seq2 = file_pasing(file_name, word_classes, t);
+	adj_array *seq2 = file_parsing(file_name, word_classes, t);
 	
-	// printf("\n");
-
-
 	graph *g1_word = graph_from_sequence(seq1->adjacencies_by_word, seq1->size);
 	graph *g2_word = graph_from_sequence(seq2->adjacencies_by_word, seq2->size);
 	
 	graph *g1_class = graph_from_sequence(seq1->adjacencies_by_class, seq1->size);
 	graph *g2_class = graph_from_sequence(seq2->adjacencies_by_class, seq2->size);
 
-	printf("\n");
 	double 	sim_wordv = graph_vertex_similarity(g1_word,g2_word),
 		sim_worde = graph_edge_similarity(g1_word,g2_word),
 		sim_classe = graph_edge_similarity(g1_class,g2_class);
 	double sim_mean = (sim_wordv * WEIGHT[0] + sim_worde * WEIGHT[1] + sim_classe * WEIGHT[2] ) / (WEIGHT[0] + WEIGHT[1] + WEIGHT[2]);
 	
+	printf("\n");
 	printf("=======================================================================================\n");
 	//comparando pelas palavras
 	printf("Similaridade de palavras: %.3lf%%\n", sim_wordv*100);
@@ -262,7 +259,7 @@ int main(int argc, char const *argv[]){
 	printf("Similaridade de conexões entre classes gramaticais: %.3lf%%\n", sim_classe*100);
 	printf("Similaridade média: %.3lf%%\n", sim_mean * 100);
 	printf("=======================================================================================\n");
-
+	printf("\n");
 
 	free(seq1);
 	free(seq2);
