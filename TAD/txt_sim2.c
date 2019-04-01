@@ -11,25 +11,7 @@
 #define SIZE_TAG 20
 #define WORD_MAX 1000
 
-const double WEIGHT[] = {1, 1, 2};
-//Lisa de classes relevantes para a comparacao
-enum Classes{
-	ADJ = 1,
-	ADV,
-	CN,
-	GER,
-	PPT,
-	PPA,
-	IND,
-	INF,
-	MTH,
-	V,
-	WD,
-	STT,
-	QNT,
-	PRS,
-	PNM
-};
+const double WEIGHT[] = {2, 1, 1};
 
 //struct que acumula as palavras e as suas classes
 typedef struct adjacencies_array{
@@ -45,41 +27,17 @@ typedef struct adjacencies_array{
 	- int: representando o Id da classe
 	
 */
-int get_class_id(char *class){
-	if(!strcmp(class, "ADJ")){
-		return ADJ;
-	}else if(!strcmp(class, "ADV")){
-		return ADV;
-	}else if(!strcmp(class, "CN")){
-		return CN;
-	}else if(!strcmp(class, "GER")){
-		return GER;
-	}else if(!strcmp(class, "PPT")){
-		return PPT;
-	}else if(!strcmp(class, "PPA")){
-		return PPA;
-	}else if(!strcmp(class, "IND")){
-		return IND;
-	}else if(!strcmp(class, "INF")){
-		return INF;
-	}else if(!strcmp(class, "MTH")){
-		return MTH;
-	}else if(!strcmp(class, "V")){
-		return V;
-	}else if(!strcmp(class, "WD")){
-		return WD;
-	}else if(!strcmp(class, "STT")){
-		return STT;
-	}else if(!strcmp(class, "QNT")){
-		return QNT;
-	}else if(!strcmp(class, "PRS")){
-		return PRS;
-	}else if(!strcmp(class, "PNM")){
-		return PNM;
-	}else{
-		return -1;
+int get_class_id(char *class, char tag_list[tagMAX][SIZE_TAG]){
+	
+	for( int i = 0; i < tagMAX; i++ ){
+		if(!strcmp(class, tag_list[i])){
+			return i+1;
+		}
 	}
+
+	return -1;
 }
+
 /*	Verifica se é um char valido
     Parametros:
     	- char c: char a ser vericado
@@ -112,6 +70,7 @@ void replaceChar(char *str, char replaced, char by){
 	}
 
 }
+
 /*	 transforma a string em minuscula 
     Parametros:
     	- unsigned char *word: string que sera transformada
@@ -132,6 +91,7 @@ void *to_lower_case(unsigned char *word){
 		}
 	}
 }
+
 /*	Conta quantas barras '/' tem na string
     Parametros:
     	- char *s: string 
@@ -151,6 +111,7 @@ int slash_counter(char *s){
 	
 	return slash_num;
 }
+
 /*	Verifica se a string contem o caracter 
     Parametros:
     	- char *str: string 
@@ -161,12 +122,15 @@ int slash_counter(char *s){
 */
 int str_contains(char *str, char this){
 	int str_sz = strlen(str);
+	
 	for( int i = 0; i < str_sz; i++  ){
 		if(str[i] == this)
 			return i;
 	}
+	
 	return -1;
 }
+
 /*	Retira da string caracteres indesejados
     Parametros:
     	- char *str: string 
@@ -196,6 +160,7 @@ void clear_inconvenient_chars(char *str){
 	}
 
 }
+
 /*	Verifica se a string nao contem caracteres indesejados
     Parametros:
     	- char *str: string 
@@ -225,6 +190,7 @@ int is_valid_class(char tags[tagMAX][SIZE_TAG], char *class){
 
 	return 0;
 }
+
 /*	Lê o arquivo e faz o parsing
     Parametros:
     	- char *file_name: nome do arquivo
@@ -242,7 +208,6 @@ adj_array *file_parsing( char *file_name, unsigned char word_classes[WORD_MAX][n
 	
 	char tag_list[tagMAX][SIZE_TAG] = {"ADJ", "ADV", "CN", "GER", "PPT", "PPA", "IND", 
 								"INF", "MTH", "V", "WD", "STT", "QNT", "PRS", "PNM"};
-
 	
 	FILE *txt_1;
 	txt_1 = fopen(file_name, "r");
@@ -276,7 +241,7 @@ adj_array *file_parsing( char *file_name, unsigned char word_classes[WORD_MAX][n
 			if(is_valid_class(tag_list, class) && isAceptedCharacter(word[0])){		//adiciona palavra na trie se ela eh de uma das classes aceitaveis
 				word_id = get_id(word, t);
 				seq->adjacencies_by_word[seq_it] = word_id;
-				seq->adjacencies_by_class[seq_it] = get_class_id(class);
+				seq->adjacencies_by_class[seq_it] = get_class_id(class, tag_list);
 				seq_it++;
 				(seq->size)++;
 				
