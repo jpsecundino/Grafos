@@ -11,6 +11,8 @@
 #define SIZE_TAG 20
 #define WORD_MAX 1000
 
+const double WEIGHT[] = {1, 1, 0, 2};
+
 enum Classes{
 	ADJ = 1,
 	ADV,
@@ -259,6 +261,12 @@ int main(int argc, char const *argv[]){
 	graph *g2_class = graph_from_sequence(seq2->adjacencies_by_class, seq2->size);
 
 	printf("\n");
+	double 	s1 = graph_vertex_similarity(g1_word,g2_word),
+			s2 = graph_edge_similarity(g1_word,g2_word),
+			s3 = graph_vertex_similarity(g1_class,g2_class),
+			s4 = graph_edge_similarity(g1_class,g2_class);
+	double s = (s1 * WEIGHT[0] + s2 * WEIGHT[1] + s3 * WEIGHT[2] + s4 * WEIGHT[3]) / (WEIGHT[0] + WEIGHT[1] + WEIGHT[2] + WEIGHT[3]);
+	printf("Similaridade %.3lf%%\n", s * 100);
 	printf("=======================================================================================\n");
 	//comparando pelas palavras
 	printf("Similaridade de palavras: %.3lf%%\n", graph_vertex_similarity(g1_word,g2_word)*100);
