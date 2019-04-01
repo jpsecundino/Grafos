@@ -12,7 +12,7 @@
 #define WORD_MAX 1000
 
 const double WEIGHT[] = {1, 1, 2};
-
+//Lisa de classes relevantes para a comparacao
 enum Classes{
 	ADJ = 1,
 	ADV,
@@ -31,13 +31,20 @@ enum Classes{
 	PNM
 };
 
-
+//struct que acumula as palavras e as suas classes
 typedef struct adjacencies_array{
 	int adjacencies_by_word[WORD_MAX];
 	int adjacencies_by_class[WORD_MAX];
 	int size;
 } adj_array;
 
+/*	Verifica qual a classe de class e retorna o ID
+    Parametros:
+    	- char *class: classe a ser verificada
+    Retorno:
+	- int: representando o Id da classe
+	
+*/
 int get_class_id(char *class){
 	if(!strcmp(class, "ADJ")){
 		return ADJ;
@@ -73,12 +80,27 @@ int get_class_id(char *class){
 		return -1;
 	}
 }
-
+/*	Verifica se é um char valido
+    Parametros:
+    	- char c: char a ser vericado
+    Retorno:
+	- 1 : char valido
+	- 0 : char invalido
+	
+*/
 int isAceptedCharacter(char c){
 
 	return  ((64 < c && c < 91) || ( 96 < c && c < 123)) ? 1 : 0;
 }
 
+/*	 Substitui um caracter por outro na string 
+    Parametros:
+    	- char *str: string 
+	- char replaced:char que sera substituido 
+	- char by: char que substituira
+    Sem retorno
+	
+*/
 void replaceChar(char *str, char replaced, char by){
 	
 	int str_sz = strlen(str);
@@ -90,7 +112,12 @@ void replaceChar(char *str, char replaced, char by){
 	}
 
 }
-
+/*	 transforma a string em minuscula 
+    Parametros:
+    	- unsigned char *word: string que sera transformada
+    Sem retorno
+	
+*/
 void *to_lower_case(unsigned char *word){
 	int word_size = strlen(word);
 	
@@ -105,7 +132,13 @@ void *to_lower_case(unsigned char *word){
 		}
 	}
 }
-
+/*	Conta quantas barras '/' tem na string
+    Parametros:
+    	- char *s: string 
+    Retorno:
+    	- int slash_num: numero de barras
+	
+*/
 int slash_counter(char *s){
 	int slash_num = 0;
 	int s_sz = strlen(s);
@@ -118,7 +151,14 @@ int slash_counter(char *s){
 	
 	return slash_num;
 }
-
+/*	Verifica se a string contem o caracter 
+    Parametros:
+    	- char *str: string 
+	- char this: caracter procurado
+    Retorno:
+    	- int pos: posicao do caracter
+	- -1 : caracter nao encontrado	
+*/
 int str_contains(char *str, char this){
 	int str_sz = strlen(str);
 	for( int i = 0; i < str_sz; i++  ){
@@ -127,7 +167,12 @@ int str_contains(char *str, char this){
 	}
 	return -1;
 }
-
+/*	Retira da string caracteres indesejados
+    Parametros:
+    	- char *str: string 
+    Sem retorno
+    	
+*/
 void clear_inconvenient_chars(char *str){
 
 	replaceChar(str, '*', ' ');
@@ -151,11 +196,27 @@ void clear_inconvenient_chars(char *str){
 	}
 
 }
-
+/*	Verifica se a string nao contem caracteres indesejados
+    Parametros:
+    	- char *str: string 
+    Retorno:
+    	- int 1: se nao contem os caracteres
+	- int 0: se contem os caracteres
+    	
+*/
 int has_ignored_symbols(char *str){
 	return (str[1] != '*' && str[0] != '<' && str[0] != '.' && str[0] != ',' && str[0] != ';' && str[0] != '!' && str[0] != '?') ? 0 : 1;
 }
 
+/*	Verifica se é uma classe valida
+    Parametros:
+    	- char tags: matriz que contem as tags validas
+	- char *class: classe a ser verificada
+    Retorno:
+    	- int 1: se é valida
+	- int 0: se não é valida
+    	
+*/
 int is_valid_class(char tags[tagMAX][SIZE_TAG], char *class){
 	for( int i = 0; i < tagMAX; i++  ){
 		if(strcmp(class, tags[i]) == 0)
@@ -164,7 +225,15 @@ int is_valid_class(char tags[tagMAX][SIZE_TAG], char *class){
 
 	return 0;
 }
-
+/*	Lê o arquivo e faz o parsing
+    Parametros:
+    	- char *file_name: nome do arquivo
+	- char word_classes[id][]: matriz que guarda, de acordo com o ID, a classe da palavra
+	- trie *t: ponteiro para arvore
+    Retorno:
+    	- adj_array : que contem a sequencia de palavras e a sequencia de classes de acordo com id
+    	
+*/
 adj_array *file_parsing( char *file_name, unsigned char word_classes[WORD_MAX][nameMAX], trie *t ){
 	unsigned char buffer[SIZE_BUFFER];
 	unsigned char word[nameMAX];
@@ -239,15 +308,18 @@ int main(int argc, char const *argv[]){
 	scanf("%s", file_name);
 	adj_array *seq2 = file_parsing(file_name, word_classes, t);
 	
+	//cria o grafo com os ids das palavras lidas nos dois textos
 	graph *g1_word = graph_from_sequence(seq1->adjacencies_by_word, seq1->size);
 	graph *g2_word = graph_from_sequence(seq2->adjacencies_by_word, seq2->size);
 	
+	//cria o grafo com os ids das classes lidas nos dois textos
 	graph *g1_class = graph_from_sequence(seq1->adjacencies_by_class, seq1->size);
 	graph *g2_class = graph_from_sequence(seq2->adjacencies_by_class, seq2->size);
-
-	double 	sim_wordv = graph_vertex_similarity(g1_word,g2_word),
-		sim_worde = graph_edge_similarity(g1_word,g2_word),
-		sim_classe = graph_edge_similarity(g1_class,g2_class);
+	
+	double 	sim_wordv = graph_vertex_similarity(g1_word,g2_word),//similaridade entre os vertices dos grafos
+		sim_worde = graph_edge_similarity(g1_word,g2_word),//similaridade entre as arestas dos grafos
+		sim_classe = graph_edge_similarity(g1_class,g2_class);//similaridade entre as classes dos grafos
+	//faz uma media ponderada com as similaridades, similidares 
 	double sim_mean = (sim_wordv * WEIGHT[0] + sim_worde * WEIGHT[1] + sim_classe * WEIGHT[2] ) / (WEIGHT[0] + WEIGHT[1] + WEIGHT[2]);
 	
 	printf("\n");
