@@ -10,11 +10,22 @@ struct _graph {
 	int mat[N][N];
 };
 
+/*	Cria novo grafo
+	Retorno:
+		novo grafo
+*/
 graph * graph_create(){
 	return calloc(1, sizeof(graph));
 }
 
-void graph_add_edge(graph * g, int u, int v, int w){
+/*	Adiciona nova aresta ao grafo
+	Parâmetros:
+		- graph *g : grafo em questão
+		- int u	   : primeiro nó
+		- int v    : segundo nó 
+		- int w    : peso da aresta entre os nós
+*/
+void graph_add_edge(graph *g, int u, int v, int w){
 	if (g->mat[u][v] == 0) {
 		g->cnt_edge++;
 	}
@@ -22,6 +33,13 @@ void graph_add_edge(graph * g, int u, int v, int w){
 	g->mat[v][u] = w;
 }
 
+
+/*	Remova uma aresta do grafo
+	Parâmetros:
+		- graph *g : grafo em questão
+		- int u	   : primeiro nó 
+		- int v    : segundo nó
+*/
 void graph_remove_edge(graph * g, int u, int v){
 	if (g->mat[u][v]) {
 		g->cnt_edge--;
@@ -30,14 +48,30 @@ void graph_remove_edge(graph * g, int u, int v){
 	g->mat[v][u] = 0;
 }
 
+/*	Destroi um grafo
+*/
 void graph_destroy(graph * g){
 	free(g);
 }
 
+/*	Procura o "pai" de um elemento.
+	Parâmetros:
+		- int x : elemento cujo pai será procurado
+		- int *p: vetor de "pais"
+	Retorno:
+		Caso x possua um "pai", retorna o "pai" de x;
+		Caso contrário, retorna x.
+*/
 int find(int x, int *p) {
     return p[x] ? p[x] = find(p[x], p) : x;
 }
 
+/*	Junta dois elementos num mesmo componente
+	Parâmetros:
+		- int x	: primeiro elemento
+		- int y	: segundo elemento
+		- int*p	: vetor de "pais"
+*/
 void join(int x, int y, int *p) {
     x = find(x, p);
     y = find(y, p);
@@ -50,6 +84,13 @@ void join(int x, int y, int *p) {
     }
 }
 
+/*	Verifica se é possível ter um ciclo euleriano no grafo dado
+	Parâmetros:
+		- graph *g : grafo a ser analisado
+	Retorno:
+		1 se for possível;
+		0 se não for possível.
+*/
 int is_possible(graph *g){
     int count_degree = 0;
     
@@ -69,6 +110,15 @@ int is_possible(graph *g){
     return 1;
 }
 
+/*	Verifica se a aresta entre dois nós é uma ponte
+	Parâmetros:
+		- graph *g : grafo que contém os elementos a serem analisados
+		- int u	   : primeiro nó
+		- int v    : segundo nó
+	Retorno:
+		1 se for ponte;
+		0 se não for ponte.
+*/
 int graph_bridge(graph *g, int u, int v) {
     if (u > v) {
         int k = u;
@@ -102,6 +152,13 @@ int graph_bridge(graph *g, int u, int v) {
 
 int graph_fleury_rec(graph * g, int *p, int *i, int u, int start);
 
+/*	Verifica, através do algoritmo de Fleury, se é possível ter um ciclo euleriano no grafo dado.
+	Parâmetros:
+		- graph *g : grafo a ser analisado
+		- int u	   : nó inicial
+	Retorno:
+		Vetor de inteiros com os nós na ordem em que foram visitados
+*/
 int *graph_fleury(graph * g, int u) {
     if (!is_possible(g)) {
         return NULL;
@@ -114,6 +171,18 @@ int *graph_fleury(graph * g, int u) {
     return path;
 }
 
+
+/*	Função recursiva auxiliar à graph_fleury().
+	Parâmetros:
+		- graph *g : grafo a ser analisado
+		- int *p   : vetor que representa um possível ciclo euleriano
+		- int *i   : índice do vetor p
+		- int u    : nó atual
+		- int start: nó inicial
+	Retorno:
+		1 se for possível fazer o ciclo euleriano;
+		0 se for impossível.
+*/
 int graph_fleury_rec(graph * g, int *p, int *i, int u, int start) {
 	if (g->cnt_edge == 0) 
 		return u == start;
@@ -137,17 +206,17 @@ int graph_fleury_rec(graph * g, int *p, int *i, int u, int start) {
 }
 
 int main() {
-	graph *g = graph_create();
+    graph *g = graph_create();
     int u, v;
     while (scanf("%d %d", &u, &v) == 2) {
         if (u == -1 || v == -1) break;
-        graph_add_edge(g, u, v, 1);
+        graph_add_edge(g, u, v, 1);	// adiciona nós ao grafo e cria aresta entre eles
     }
 
-	int *path = graph_fleury(g, 1);
-    if (path) {
+    int *path = graph_fleury(g, 1);	// procura ciclo euleriano no grafo dado
+    if (path) {				
 	    for (int j = 0; j < g->cnt_edge + 1; j++) {
-		    printf("%d ", path[j]);
+		    printf("%d ", path[j]);	// caso haja ciclo euleriano no grafo, imprime o caminho
 	    }
 	    printf("\n");
     } else {
