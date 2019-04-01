@@ -46,17 +46,20 @@ void graph_destroy(graph *g) {
 }
 
 double graph_vertex_similarity(graph *g1, graph *g2) {
-    int min_vertices = MIN(g1->vertices, g2->vertices);
     int max_vertices = MAX(g1->vertices, g2->vertices);
     int common_vertices = 0;
+    int total_vertices = 0;
 
-    for (int i = 0; i < min_vertices; i++) {
-        if (g1->list[i] && g2->list[i]) {
+    for (int i = 0; i < max_vertices; i++) {
+        if (i < g1->vertices && i < g2->vertices && g1->list[i] && g2->list[i]) {
             common_vertices++;
+        }
+        if ((i < g1->vertices && g1->list[i]) || (i < g2->vertices && g2->list[i])) {
+            total_vertices++;
         }
     }
 
-    return common_vertices / (double) max_vertices;
+    return common_vertices / (double) total_vertices;
 }
 
 double graph_edge_similarity(graph *g1, graph *g2) {
