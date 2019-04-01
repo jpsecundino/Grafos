@@ -14,7 +14,7 @@ typedef struct _node node;
         - node *head    : primeiro elemento da lista
         - node_val val  : elemento a ser adicionado
     Retorno:
-        novo elemento adicionado à lista
+        ponteiro para o novo primeiro elemento da lista
 */
 node *list_insert(node *head, node_val val);
 
@@ -24,7 +24,7 @@ node *list_insert(node *head, node_val val);
         - node *head    : primeiro elemento da lista
         - node_val val  : elemento a ser removido
     Retorno:
-        novo elemento removido da lista
+        ponteiro para o novo primeiro elemento da lista
 */
 node *list_delete(node *head, node_val val);
 
@@ -33,8 +33,8 @@ node *list_delete(node *head, node_val val);
     Parâmetros:
         - node *head    : primeiro elemento da lista
     Retorno:
-        Caso não haja elementos da lista, retorna NULL;
-        Caso haja, retorna o elemento seguinte ao primeiro
+        Caso não haja um próximo elemento na lista, retorna NULL;
+        Caso haja, retorna o elemento seguinte a 'head'
 */
 node *list_next(node *head);
 
