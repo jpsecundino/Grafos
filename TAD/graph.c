@@ -39,6 +39,9 @@ graph *graph_from_sequence(int *seq, int len) {
 
 void graph_destroy(graph *g) {
     for(int i = 0; i < g->vertices; i++) {
+        for (node *x = g->list[i]; x; x = list_next(x)) {
+            free(list_val(x).pointer);
+        }
         list_destroy(g->list[i]);
     }
     free(g->list);
