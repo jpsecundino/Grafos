@@ -1,5 +1,2 @@
-<p><s> Os/DA#mp turistas/TURISTA/CN#mp que/REL chegam/CHEGAR/V#pi-3p a/DA#fs Boston/PNM ,*//PNT em_/PREP os/DA#mp Estados/PNM Unidos/PNM ,*//PNT têm/TER/V#pi-3p uma/UM#fs agradável/AGRADáVEL/ADJ#fs surpresa/SURPRESA/CN#fs :*//PNT uma/UM#fs viagem/VIAGEM/CN#fs em_/PREP a/DA#fs Silver/PNM Line/PNM ,*//PNT o/DA#ms corredor/CORREDOR/CN#ms de/PREP ônibus/ôNIBU/CN#mp que/REL liga/LIGAR/V#pi-3s o/DA#ms aeroporto/AEROPORTO/CN#ms a_/PREP o/DA#ms centro/CENTRO/CN#ms de_/PREP a/DA#fs cidade/CIDADE/CN#fs ,*//PNT sai/SAIR/V#pi-3s de/PREP graça/GRAçA/CN#fs .*//PNT </s> 
-<s> Mas/CJ a/DA#fs tarifa/TARIFA/ADJ#fs zero/ZERO/CN#fs só/ADV vale/VALER/V#pi-3s para/PREP quem/REL embarca/EMBARCAR/V#pi-3s em_/PREP o/DA#ms próprio/PRóPRIO/ADJ#ms aeroporto/AEROPORTO/CN#ms :*//PNT passageiros/PASSAGEIRO/CN#mp regulares/REGULAR/ADJ#mp pagam/PAGAR/V#pi-3p US/PNM $*//PNT 2/DGT ,/PNT 65/DGT ./PNT </s></p> 
+<p><s> Ontem/ADV eu/PRS#gs1 fui/SER/V#ppi-1s a/DA#fs feira/FEIRA/CN#fs comprar/COMPRAR/V#inf-nInf caju/?/V#? </s></p> 
  
- 
-        

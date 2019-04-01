@@ -1,9 +1,2 @@
-<p><s> Pousou/POUSAR/V#ppi-3s em/PREP meio/MEIO/CN#ms a_/PREP as/DA#fp rochas/ROCHA/CN#fp .*//PNT </s> 
-<s> Suas/POSS#fp asas/ASA/CN#fp se/CL#gn3 fecharam/FECHAR/V#pi-3p ,*//PNT seu/POSS#ms corpo/CORPO/CN#ms começava/COMEÇAR/V#ii-3s a/PREP se/CL#gn3 esfriar/ESFRIAR/V#INF-nInf .*//PNT </s> 
-<s> O/DA#ms peso/PESO/CN#ms de_/PREP os/DA#mp anos/ANO/CN#mp fazia/FAZER/V#ii-3s suas/POSS#fp penas/PENA/CN#fp se/CL#gn3 esfarelarem/ESFARELAR/V#INF-3p e/CJ sua/POSS#fs chama/CHAMAR/V#pi-3s amiudar/AMIUDAR/V#INF-nInf .*//PNT </s> 
-<s> Percebeu/PERCEBER/V#ppi-3s que/CJ era/SER/V#ii-3s a/DA#fs hora/HORA/CN#fs de_/PREP a/DA#fs partida/PARTIDA/CN#fs .*//PNT </s> 
-<s> Olhou/OLHAR/V#ppi-3s para/PREP o/DA#ms céu/CéU/CN#ms estrelado/ESTRELAR,ESTRELADO/PPA#ms ,*//PNT morrer/MORRER/V#inf-nInf era/SER/V#ii-3s uma/UM#fs de_/PREP as/DA#fp leis/LEI/CN#fp de_/PREP a/DA#fs natureza/NATUREZA/CN#fs ,*//PNT mas/CJ nem/ADV por/PREP isso/DEM#ms era/SER/V#ii-3s algo/IND#ms bom/BOM/ADJ#gs .*//PNT </s> 
-<s> Guinchou/GUINCHAR/V#ppi-3s fracamente/ADV ,*//PNT seu/POSS#ms fogo/FOGO/CN#ms apagou/APAGAR/V#ppi-3s ,*//PNT seu/POSS#ms corpo/CORPO/CN#ms caiu/CAIR/V#ppi-3s em_/PREP o/DA#ms chão/CHãO/CN#ms e/CJ se/CL#gn3 transformou/TRANSFORMAR/V#ppi-3s em/PREP cinzas/CINZA/CN#fp negras/NEGRO/ADJ#fp ./PNT  </s></p> 
+<p><s> Hoje/ADV eu/PRS#gs1 fui/SER/V#ppi-1s a_/PREP a/DA#fs feira/FEIRA/CN#fs comprar/COMPRAR/V#inf-nInf manga/MANGA/CN#fs </s></p> 
  
- 
-        

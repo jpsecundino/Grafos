@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "trie.h"
-#include<locale.h>
+#include "graph.h"
+
 // #define fileMAX 100
 #define nameMAX 20
 #define tagMAX 15
@@ -10,6 +11,66 @@
 #define SIZE_TAG 20
 #define WORD_MAX 1000
 
+enum Classes{
+	ADJ = 1,
+	ADV,
+	CN,
+	GER,
+	PPT,
+	PPA,
+	IND,
+	INF,
+	MTH,
+	V,
+	WD,
+	STT,
+	QNT,
+	PRS,
+	PNM
+};
+
+
+typedef struct adjacencies_array{
+	int adjacencies_by_word[WORD_MAX];
+	int adjacencies_by_class[WORD_MAX];
+	int size;
+} adj_array;
+
+int get_class_id(char *class){
+	if(!strcmp(class, "ADJ")){
+		return ADJ;
+	}else if(!strcmp(class, "ADV")){
+		return ADV;
+	}else if(!strcmp(class, "CN")){
+		return CN;
+	}else if(!strcmp(class, "GER")){
+		return GER;
+	}else if(!strcmp(class, "PPT")){
+		return PPT;
+	}else if(!strcmp(class, "PPA")){
+		return PPA;
+	}else if(!strcmp(class, "IND")){
+		return IND;
+	}else if(!strcmp(class, "INF")){
+		return INF;
+	}else if(!strcmp(class, "MTH")){
+		return MTH;
+	}else if(!strcmp(class, "V")){
+		return V;
+	}else if(!strcmp(class, "WD")){
+		return WD;
+	}else if(!strcmp(class, "STT")){
+		return STT;
+	}else if(!strcmp(class, "QNT")){
+		return QNT;
+	}else if(!strcmp(class, "PRS")){
+		return PRS;
+	}else if(!strcmp(class, "PNM")){
+		return PNM;
+	}else{
+		return -1;
+	}
+}
 
 int isAceptedCharacter(char c){
 
@@ -102,28 +163,21 @@ int is_valid_class(char tags[tagMAX][SIZE_TAG], char *class){
 	return 0;
 }
 
-int main(int argc, char const *argv[]){
-	setlocale(LC_ALL,""); 
-
-	char tag_list[tagMAX][SIZE_TAG] = {"ADJ", "ADV", "CN", "GER", "PPT", "PPA", "IND", 
-								"INF", "MTH", "V", "WD", "STT", "QNT", "PRS", "PNM"};
-
-	FILE *txt_1/*, *txt_2*/;
+adj_array *file_pasing( char *file_name, unsigned char word_classes[WORD_MAX][nameMAX], trie *t ){
+	unsigned char buffer[SIZE_BUFFER];
 	unsigned char word[nameMAX];
 	unsigned char class[nameMAX];
 	unsigned char inconvenient;
+	
+	char tag_list[tagMAX][SIZE_TAG] = {"ADJ", "ADV", "CN", "GER", "PPT", "PPA", "IND", 
+								"INF", "MTH", "V", "WD", "STT", "QNT", "PRS", "PNM"};
 
-	// Inserir nome do primeiro texto
-	unsigned char file_name[nameMAX] = "sample.txt";
-	printf("Digite o nome do arquivo\n");
-	scanf("%s", file_name);
+	
+	FILE *txt_1;
 	txt_1 = fopen(file_name, "r");
 
-	unsigned char buffer[SIZE_BUFFER];
-	int word_counter = 0;
-	
-	trie *t = create_trie();
-	unsigned char word_classes[WORD_MAX][nameMAX] = {};
+	adj_array *seq = (adj_array *) calloc(1,sizeof(adj_array));
+	int seq_it = 0;
 
 	while (!feof(txt_1)) {// fazer pros dois textos
 		fscanf(txt_1, "%s", buffer);
@@ -136,7 +190,7 @@ int main(int argc, char const *argv[]){
 
 			// printf("%s\n", buffer);			//ative se quiser ver o buffer formatado
 
-			int id = 0;
+			int word_id = 0;
 			if(slash_num == 1) {
 				sscanf(buffer, "%s %s %*s", word, class);
 			} else if (slash_num == 2) {
@@ -148,22 +202,82 @@ int main(int argc, char const *argv[]){
 			
 			to_lower_case(word); 				//coloca a string em letras minusculas
 
-			if(is_valid_class(tag_list, class)){		//adiciona palavra na trie se ela eh de uma das classes aceitaveis
-				id = get_id(word, t);
-				strcpy(word_classes[id], class);
-				printf("{%s, %s} -> ", word, class);
-				if( !strcmp(word_classes[id], class) && get_id(word, t) == id )
-					printf("Sucesso.\n"); 		//debugger para saber se a palavra foi inserida corretamente na trie e no vetor de classes
+			if(is_valid_class(tag_list, class) && isAceptedCharacter(word[0])){		//adiciona palavra na trie se ela eh de uma das classes aceitaveis
+				word_id = get_id(word, t);
+				seq->adjacencies_by_word[seq_it] = word_id;
+				seq->adjacencies_by_class[seq_it] = get_class_id(class);
+				seq_it++;
+				(seq->size)++;
+				
+				// strcpy(word_classes[word_id], class);
+				// printf("{%s, %s, %d} -> ", word, class, get_id(word, t));
+				// if( !strcmp(word_classes[word_id], class) && get_id(word, t) == word_id )
+				// 	printf("Sucesso.\n"); 		//debugger para saber se a palavra foi inserida corretamente na trie e no vetor de classes
 			}					
-			if(id)
-				word_counter++;
 
 		}
 	}
+	
+	fclose(txt_1);
 
+	return seq;
+}
+
+int main(int argc, char const *argv[]){
+
+	trie *t = create_trie();
+	unsigned char word_classes[WORD_MAX][nameMAX] = {};
+	char file_name[nameMAX] = {};
+	
+	printf("Digite o nome do primeiro arquivo\n");
+	scanf("%s", file_name);
+
+	adj_array *seq1 = file_pasing(file_name, word_classes, t);
+	adj_array *seq2 = file_pasing(file_name, word_classes, t);
+
+	printf("Digite o nome do segundo arquivo\n");
+	scanf("%s", file_name);
+
+	for (int i = 0; i < seq1->size; ++i)
+	{
+		printf("%d ", seq1->adjacencies_by_class[i]);
+	}
+
+	printf("\n");
+	for (int i = 0; i < seq1->size; ++i)
+	{
+		printf("%d ", seq2->adjacencies_by_class[i]);
+	}
+
+	printf("\n");
+
+
+	graph *g1_word = graph_from_sequence(seq1->adjacencies_by_word, seq1->size);
+	graph *g2_word = graph_from_sequence(seq2->adjacencies_by_word, seq2->size);
+	
+	graph *g1_class = graph_from_sequence(seq1->adjacencies_by_class, seq1->size);
+	graph *g2_class = graph_from_sequence(seq2->adjacencies_by_class, seq2->size);
+
+	printf("\n");
+	printf("=======================================================================================\n");
+	//comparando pelas palavras
+	printf("Similaridade de palavras: %.3lf%%\n", graph_vertex_similarity(g1_word,g2_word)*100);
+	printf("Similaridade de conexões entre palavras: %.3lf%%\n", graph_edge_similarity(g1_word,g2_word)*100);
+	//comparando pelas classes
+	printf("Similaridade de classes gramaticais: %.3lf%%\n", graph_vertex_similarity(g1_class,g2_class)*100);
+	printf("Similaridade de conexões entre classes gramaticais: %.3lf%%\n", graph_edge_similarity(g1_class,g2_class)*100);
+	printf("=======================================================================================\n");
+
+
+	free(seq1);
+	free(seq2);
+	graph_destroy(g1_word);
+	graph_destroy(g2_word);
+	graph_destroy(g1_class);
+	graph_destroy(g2_class);	
 	trie_destroy(t);
 
-	fclose(txt_1);
+
 
 	return 0;
 }
