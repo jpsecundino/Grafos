@@ -3,7 +3,7 @@ void get_sentence(char ***s, int *actual_size, int * total_size){
     int i = 0;
     char aux[128];
 
-    while(scanf("%s", aux) > 0){
+    while(scanf("%128s", aux) > 0){
         if(i == *total_size){
             *s = realloc(*s, 2 * (*total_size + 1) * sizeof(char *));
             *total_size = (*total_size + 1) * 2;
