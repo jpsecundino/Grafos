@@ -8,6 +8,7 @@
 
 struct _graph {
     int vertices;
+    double mean_weight;
     node **list;
 };
 
@@ -18,20 +19,25 @@ graph *graph_create(int vertices) {
     return g;
 }
 
-graph *graph_from_sequence(int *seq, int len) {
+graph *graph_from_sequence(int *seq, int len, int end) {
     int vertices = -1;
+    int edge_sum = 0, edge_cnt = 0;
     for (int i = 0; i < len; i++) {
         vertices = MAX(vertices, seq[i]);
     }
     graph *g = graph_create(vertices + 1);
     for (int i = 1; i < len; i++) {
+        if (seq[i - 1] == end) continue;
         graph_edge *ge = graph_edge_get(g, seq[i - 1], seq[i]);
         if (ge) {
             ge->w++;
         } else {
             graph_edge_add(g, seq[i - 1], seq[i], 1);
+            edge_cnt++;
         }
+        edge_sum++;
     }
+    g->mean_weight = edge_sum / (double) edge_cnt;
     return g;
 }
 
@@ -79,4 +85,8 @@ node *graph_edge_list(graph *g, int u) {
 
 int graph_vertex_count(graph *g) {
     return g->vertices;
+}
+
+double graph_mean_weight(graph *g) {
+    return g->mean_weight;
 }

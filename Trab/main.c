@@ -21,6 +21,10 @@ void add(int **seq, int *cnt, int *len, int x) {
     (*seq)[(*cnt)++] = x;
 }
 
+double weight(graph *g, int u, int v, int freq) {
+    return graph_mean_weight(g) / freq + 0.1;
+}
+
 void shortest_path(int v0, graph *g, double *dist, int *parent) {
     int *set = malloc(graph_vertex_count(g) * sizeof(int));
     for (int i = 0; i < graph_vertex_count(g); i++) {
@@ -36,8 +40,8 @@ void shortest_path(int v0, graph *g, double *dist, int *parent) {
         set[u] = 0;
         for (node *x = graph_edge_list(g, u); x; x = list_next(x)) {
             graph_edge *ge = list_val(x).pointer;
-            if (dist[ge->v] > dist[u] + 1.0 / ge->w) {
-                dist[ge->v] = dist[u] + 1.0 / ge->w;
+            if (dist[ge->v] > dist[u] + weight(g, u, ge->v,ge->w)) {
+                dist[ge->v] = dist[u] + weight(g, u, ge->v,ge->w);
                 parent[ge->v] = u;
                 if (set[ge->v] == 2) {
                     deque_push_back(&head, &tail, (node_val){.ll = ge->v});
@@ -83,11 +87,30 @@ graph *load_words(FILE *f, trie *t) {
         add(&seq, &cnt, &cap, END);
     }
 
-    graph *g = graph_from_sequence(seq, cnt);
+    graph *g = graph_from_sequence(seq, cnt, END);
     if (seq != NULL) {
         free(seq);
     }
     return g;
+}
+
+void get_sentence(char ***s, int *actual_size, int * total_size){
+    int i = 0;
+    char aux[128];
+
+    while(scanf("%128s", aux) > 0){
+        if(i == *total_size){
+            *total_size = *total_size == 0 ? 1 : 2 * *total_size;
+            *s = realloc(*s, *total_size * sizeof(char *));
+        }
+
+        (*s)[i] = malloc(sizeof(char) * 128);
+        
+        strcpy((*s)[i], aux);
+        i++;
+        if (i == 3) break;
+    }
+    *actual_size = i;
 }
 
 int main(int argc, char **argv) {
@@ -98,7 +121,6 @@ int main(int argc, char **argv) {
     if (f == NULL) {
         return 2;
     }
-    srand(time(NULL));
 
     trie *t = create_trie();
     graph *g = load_words(f, t);
@@ -107,11 +129,41 @@ int main(int argc, char **argv) {
 
     double *dist = malloc(graph_vertex_count(g) * sizeof(double));
     int *parent = malloc(graph_vertex_count(g) * sizeof(int));
+    char **input = NULL;
+    int cnt = 0, len = 0;
+    
+    get_sentence(&input, &cnt, &len);
 
-    shortest_path(BEGIN, g, dist, parent);
-    for (int i = 0; i < graph_vertex_count(g); i++) {
-        printf("%d %f %d\n", i, dist[i], parent[i]);
+    int u = BEGIN;
+    for (int i = 0; i <= cnt; i++){
+        int v = i == cnt ? END : get_id(t, input[i]) + FIRST_WORD_ID; 
+        if (v >= graph_vertex_count(g)) {
+            printf("A palavra nao existe no dicionario\n");
+            exit(0);
+        }
+        shortest_path(u, g, dist, parent);
+        if (parent[v] == -1 && u != v) {
+            printf("Nao foi possivel formar uma frase\n");
+            exit(0);
+        }
+        printf("%d: ", i);
+        u = v;
+        node *stack = NULL;
+        while (parent[v] != -1) {
+            if(v != END) {
+                stack = list_insert(stack, (node_val){.pointer=get_word(t, v - FIRST_WORD_ID)});
+            }
+            v = parent[v];
+        }
+        while (stack) {
+            node_val word = list_val(stack);
+            stack = list_delete(stack, word);
+            printf("'%s' ", word.pointer);
+            free(word.pointer);
+        }
+        printf("\n");
     }
+    shortest_path(BEGIN, g, dist, parent);
 
     trie_destroy(t);
     graph_destroy(g);
