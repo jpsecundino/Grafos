@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
 #include "trie.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define K 26
 
@@ -23,14 +23,14 @@ struct _trie {
 
 trie *create_trie() {
     trie *t = calloc(1, sizeof(trie));
-    
-    if(t == NULL) {
+
+    if (t == NULL) {
         return NULL;
     }
 
     t->root = calloc(1, sizeof(trie_node));
 
-    if(t->root == NULL) {
+    if (t->root == NULL) {
         free(t);
         return NULL;
     }
@@ -44,14 +44,14 @@ static void node_destroy(trie_node *tn) {
     if (tn == NULL) {
         return;
     }
-	for(int i = 0; i < K; i++){
-		node_destroy(tn->children[i]);
-	}
+    for (int i = 0; i < K; i++) {
+        node_destroy(tn->children[i]);
+    }
     free(tn);
 }
 
 void trie_destroy(trie *t) {
-	node_destroy(t->root);
+    node_destroy(t->root);
     if (t->id_inv != NULL) {
         free(t->id_inv);
     }

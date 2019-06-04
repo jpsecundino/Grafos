@@ -1,7 +1,6 @@
+#include "list.h"
 #include <stdlib.h>
 #include <string.h>
-
-#include "list.h"
 
 struct _node {
     node_val val;
@@ -32,7 +31,7 @@ node *list_next(node *head) {
 }
 
 node_val list_val(node *head) {
-    return head ? head->val : (node_val) {.pointer = NULL};
+    return head ? head->val : (node_val){.pointer = NULL};
 }
 
 void list_destroy(node *head) {
@@ -41,4 +40,33 @@ void list_destroy(node *head) {
         free(head);
         head = next;
     }
+}
+
+void deque_push_front(node **head, node **tail, node_val val) {
+    *head = list_insert(*head, val);
+    if (*tail == NULL) {
+        *tail = *head;
+    }
+}
+
+void deque_push_back(node **head, node **tail, node_val val) {
+    if (*head == NULL) {
+        deque_push_front(head, tail, val);
+    } else {
+        *tail = (*tail)->next = list_insert(NULL, val);
+    }
+}
+
+node_val deque_pop_front(node **head, node **tail) {
+    node_val val = list_val(*head);
+    node *aux = *head;
+    if (*head == *tail) {
+        *head = *tail = NULL;
+    } else {
+        *head = (*head)->next;
+    }
+    if (aux) {
+        free(aux);
+    }
+    return val;
 }

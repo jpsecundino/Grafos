@@ -18,7 +18,6 @@ typedef struct _node node;
 */
 node *list_insert(node *head, node_val val);
 
-
 /*  Deleta um elemento na lista
     Parâmetros:
         - node *head    : primeiro elemento da lista
@@ -27,7 +26,6 @@ node *list_insert(node *head, node_val val);
         ponteiro para o novo primeiro elemento da lista
 */
 node *list_delete(node *head, node_val val);
-
 
 /*  Retorna o próximo elemento da lista
     Parâmetros:
@@ -52,3 +50,9 @@ node_val list_val(node *head);
         - node *head    : primeiro elemento da lista
 */
 void list_destroy(node *head);
+
+void deque_push_front(node **head, node **tail, node_val val);
+
+void deque_push_back(node **head, node **tail, node_val val);
+
+node_val deque_pop_front(node **head, node **tail);

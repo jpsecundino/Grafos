@@ -73,3 +73,5 @@ void graph_edge_remove(graph *g, int u, int v);
         - lista de adjacência do nó em questão
 */
 node *graph_edge_list(graph *g, int u);
+
+int graph_vertex_count(graph *g);

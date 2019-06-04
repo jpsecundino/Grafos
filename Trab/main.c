@@ -1,11 +1,11 @@
+#include <ctype.h>
+#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <ctype.h>
 #include <time.h>
-
-#include "list.h"
 #include "graph.h"
+#include "list.h"
 #include "trie.h"
 
 #define BUFFER_SIZE 128
@@ -21,17 +21,37 @@ void add(int **seq, int *cnt, int *len, int x) {
     (*seq)[(*cnt)++] = x;
 }
 
-int main(int argc, char **argv) {
-    if (argc < 2) {
-        return 1;
+void shortest_path(int v0, graph *g, double *dist, int *parent) {
+    int *set = malloc(graph_vertex_count(g) * sizeof(int));
+    for (int i = 0; i < graph_vertex_count(g); i++) {
+        set[i] = 2;
+        dist[i] = INFINITY;
+        parent[i] = -1;
     }
-    FILE *f = fopen(argv[1], "r");
-    if (f == NULL) {
-        return 2;
+    dist[v0] = 0.0;
+    node *head = NULL, *tail = head;
+    deque_push_back(&head, &tail, (node_val){.ll = v0});
+    while (head != NULL) {
+        int u = deque_pop_front(&head, &tail).ll;
+        set[u] = 0;
+        for (node *x = graph_edge_list(g, u); x; x = list_next(x)) {
+            graph_edge *ge = list_val(x).pointer;
+            if (dist[ge->v] > dist[u] + 1.0 / ge->w) {
+                dist[ge->v] = dist[u] + 1.0 / ge->w;
+                parent[ge->v] = u;
+                if (set[ge->v] == 2) {
+                    deque_push_back(&head, &tail, (node_val){.ll = ge->v});
+                } else if (set[ge->v] == 0) {
+                    deque_push_front(&head, &tail, (node_val){.ll = ge->v});
+                }
+                set[ge->v] = 1;
+            }
+        }
     }
-    srand(time(NULL));
+    free(set);
+}
 
-    trie *t = create_trie();
+graph *load_words(FILE *f, trie *t) {
     int *seq = NULL;
     int cnt = 0, cap = 0;
 
@@ -62,42 +82,39 @@ int main(int argc, char **argv) {
         add(&seq, &cnt, &cap, last_word);
         add(&seq, &cnt, &cap, END);
     }
-    fclose(f);
 
     graph *g = graph_from_sequence(seq, cnt);
-
-    int u = BEGIN;
-    int it = 100;
-    int first = 1;
-    while (it--) {
-        int v = -1, max_w = 0;
-        for (node *x = graph_edge_list(g, u); x; x = list_next(x)) {
-            graph_edge *ge = list_val(x).pointer;
-            int change = ((ge->w > max_w || ge->v == END) && (rand() & 1)) || ((rand() & 3) == 0);
-            if (change) {
-                v = ge->v;
-                max_w = ge->w;
-            }
-        }
-        u = v;
-
-        if (u == -1 || u == END) {
-            break;
-        }
-
-        char *word = get_word(t, u - FIRST_WORD_ID);
-        if (!first) {
-            printf(" ");
-        }
-        first = 0;
-        printf("%s", word);
-    }
-    printf(".\n");
-
-
-    trie_destroy(t);
-    graph_destroy(g);
     if (seq != NULL) {
         free(seq);
     }
+    return g;
+}
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        return 1;
+    }
+    FILE *f = fopen(argv[1], "r");
+    if (f == NULL) {
+        return 2;
+    }
+    srand(time(NULL));
+
+    trie *t = create_trie();
+    graph *g = load_words(f, t);
+
+    fclose(f);
+
+    double *dist = malloc(graph_vertex_count(g) * sizeof(double));
+    int *parent = malloc(graph_vertex_count(g) * sizeof(int));
+
+    shortest_path(BEGIN, g, dist, parent);
+    for (int i = 0; i < graph_vertex_count(g); i++) {
+        printf("%d %f %d\n", i, dist[i], parent[i]);
+    }
+
+    trie_destroy(t);
+    graph_destroy(g);
+    free(dist);
+    free(parent);
 }

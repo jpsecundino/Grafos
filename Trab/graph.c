@@ -1,13 +1,12 @@
+#include "graph.h"
 #include <stdlib.h>
 #include <string.h>
-
-#include "graph.h"
 #include "list.h"
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
-struct _graph{
+struct _graph {
     int vertices;
     node **list;
 };
@@ -37,7 +36,7 @@ graph *graph_from_sequence(int *seq, int len) {
 }
 
 void graph_destroy(graph *g) {
-    for(int i = 0; i < g->vertices; i++) {
+    for (int i = 0; i < g->vertices; i++) {
         for (node *x = g->list[i]; x; x = list_next(x)) {
             free(list_val(x).pointer);
         }
@@ -49,8 +48,8 @@ void graph_destroy(graph *g) {
 
 void graph_edge_add(graph *g, int u, int v, int w) {
     graph_edge *ge = malloc(sizeof(graph_edge));
-    *ge = (graph_edge) {u, v, w};
-    g->list[u] = list_insert(g->list[u], (node_val) {.pointer = (void*) ge});
+    *ge = (graph_edge){u, v, w};
+    g->list[u] = list_insert(g->list[u], (node_val){.pointer = (void *)ge});
 }
 
 graph_edge *graph_edge_get(graph *g, int u, int v) {
@@ -67,7 +66,7 @@ graph_edge *graph_edge_get(graph *g, int u, int v) {
 void graph_edge_remove(graph *g, int u, int v) {
     for (node *x = g->list[u]; x; x = list_next(x)) {
         graph_edge *ge = list_val(x).pointer;
-        if(ge->v == v){
+        if (ge->v == v) {
             g->list[u] = list_delete(g->list[u], list_val(x));
             break;
         }
@@ -76,4 +75,8 @@ void graph_edge_remove(graph *g, int u, int v) {
 
 node *graph_edge_list(graph *g, int u) {
     return g->list[u];
+}
+
+int graph_vertex_count(graph *g) {
+    return g->vertices;
 }
