@@ -13,6 +13,8 @@
 #define END 1
 #define FIRST_WORD_ID 2
 
+double new_word_penality = 0.1;
+
 void add(int **seq, int *cnt, int *len, int x) {
     if (*cnt == *len) {
         *len = (*len) == 0 ? 1 : 2 * (*len);
@@ -22,7 +24,7 @@ void add(int **seq, int *cnt, int *len, int x) {
 }
 
 double weight(graph *g, int u, int v, int freq) {
-    return graph_mean_weight(g) / freq + 0.1;
+    return graph_mean_weight(g) / freq + 0.15;
 }
 
 void shortest_path(int v0, graph *g, double *dist, int *parent) {
@@ -67,7 +69,7 @@ graph *load_words(FILE *f, trie *t) {
             if (!isalpha(word[i])) {
                 int punct = word[i] == '.';
                 word[i] = '\0';
-                int curr_word = get_id(t, word + j) + FIRST_WORD_ID;
+                int curr_word = get_id(t, word + j, 1) + FIRST_WORD_ID;
                 if (curr_word != -1 + FIRST_WORD_ID) {
                     add(&seq, &cnt, &cap, last_word);
                     if (punct) {
@@ -94,76 +96,129 @@ graph *load_words(FILE *f, trie *t) {
     return g;
 }
 
-void get_sentence(char ***s, int *actual_size, int * total_size){
-    int i = 0;
-    char aux[128];
+void get_sentence(char ***s, int *total_size){
+    char aux[1024];
+    fgets(aux, 1024, stdin);
 
-    while(scanf("%128s", aux) > 0){
-        if(i == *total_size){
-            *total_size = *total_size == 0 ? 1 : 2 * *total_size;
-            *s = realloc(*s, *total_size * sizeof(char *));
+    *total_size = 0;
+    for (int i = 0, j = 0; ; i++) {
+        if (isalpha(aux[i])) {
+            j++;
+        } else {
+            if (j > 0) {
+                (*total_size)++;
+            }
+            j = 0;
         }
-
-        (*s)[i] = malloc(sizeof(char) * 128);
-        
-        strcpy((*s)[i], aux);
-        i++;
-        if (i == 3) break;
+        if (aux[i] == '\0') {
+            break;
+        }
     }
-    *actual_size = i;
+
+    *s = malloc(*total_size * sizeof(char *));
+    for (int i = 0, j = 0, k = 0; ; i++) {
+        int end_flag = aux[i] == '\0';
+        if (isalpha(aux[i])) {
+            j++;
+        } else {
+            if (j > 0) {
+                aux[i] = '\0';
+                (*s)[k] = malloc(j + 1);
+                strcpy((*s)[k], aux + i - j);
+                k++;
+            }
+            j = 0;
+        }
+        if (end_flag) {
+            break;
+        }
+    }
 }
 
 int main(int argc, char **argv) {
     if (argc < 2) {
+        printf("Entre o arquivo de dicionario como argumento.\n");
         return 1;
+    }
+    if (argc >= 3) {
+        new_word_penality = atof(argv[2]);
+        printf("Usando penalidade de adicionar palavras = %f\n", new_word_penality);
     }
     FILE *f = fopen(argv[1], "r");
     if (f == NULL) {
+        printf("Falha ao ler arquivo.\n");
         return 2;
     }
 
+    printf("Carregando arquivo.\n");
     trie *t = create_trie();
     graph *g = load_words(f, t);
+    printf("Arquivo carregado.\n");
+    printf("Digite as palavras para gerar uma frase. Para sair nao digite nada e aperte enter.\n");
 
     fclose(f);
 
     double *dist = malloc(graph_vertex_count(g) * sizeof(double));
     int *parent = malloc(graph_vertex_count(g) * sizeof(int));
-    char **input = NULL;
-    int cnt = 0, len = 0;
-    
-    get_sentence(&input, &cnt, &len);
+    while (1) {
+        char **input = NULL;
+        int cnt = 0;
+        get_sentence(&input, &cnt);
+        if (cnt == 0) {
+            break;
+        }
 
-    int u = BEGIN;
-    for (int i = 0; i <= cnt; i++){
-        int v = i == cnt ? END : get_id(t, input[i]) + FIRST_WORD_ID; 
-        if (v >= graph_vertex_count(g)) {
-            printf("A palavra nao existe no dicionario\n");
-            exit(0);
-        }
-        shortest_path(u, g, dist, parent);
-        if (parent[v] == -1 && u != v) {
-            printf("Nao foi possivel formar uma frase\n");
-            exit(0);
-        }
-        printf("%d: ", i);
-        u = v;
-        node *stack = NULL;
-        while (parent[v] != -1) {
-            if(v != END) {
-                stack = list_insert(stack, (node_val){.pointer=get_word(t, v - FIRST_WORD_ID)});
+        node *output_head = NULL, *output_tail = NULL;
+
+        int ok = 1;
+        int u = BEGIN;
+        for (int i = 0; i <= cnt; i++) {
+            int v = i == cnt ? END : get_id(t, input[i], 0) + FIRST_WORD_ID; 
+            if (v < 0) {
+                printf("A palavra '%s' nao existe no dicionario", input[i]);
+                ok = 0;
+                break;
             }
-            v = parent[v];
+            shortest_path(u, g, dist, parent);
+            if (parent[v] == -1 && u != v) {
+                printf("Nao foi possivel formar uma frase");
+                ok = 0;
+                break;
+            }
+            u = v;
+            node *stack = NULL;
+            while (parent[v] != -1) {
+                if(v != END) {
+                    stack = list_insert(stack, (node_val){.pointer=get_word(t, v - FIRST_WORD_ID)});
+                }
+                v = parent[v];
+            }
+            while (stack) {
+                node_val word = list_val(stack);
+                stack = list_delete(stack, word);
+                deque_push_back(&output_head, &output_tail, word);
+            }
         }
-        while (stack) {
-            node_val word = list_val(stack);
-            stack = list_delete(stack, word);
-            printf("'%s' ", word.pointer);
-            free(word.pointer);
+
+        int first = 1;
+        while (ok && output_head) {
+            char *word = deque_pop_front(&output_head, &output_tail).pointer;
+            if (!first) {
+                printf(" ");
+            } else {
+                word[0] = toupper(word[0]);
+            }
+            first = 0;
+            printf("%s", word);
+            free(word);
         }
-        printf("\n");
+        printf(".\n");
+
+        for (int i = 0; i < cnt; i++) {
+            free(input[i]);
+        }
+        free(input);
     }
-    shortest_path(BEGIN, g, dist, parent);
 
     trie_destroy(t);
     graph_destroy(g);

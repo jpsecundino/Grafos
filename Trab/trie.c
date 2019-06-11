@@ -11,6 +11,7 @@ struct _trie_node {
     char c;
     int id;
     int depth;
+    int ending;
     trie_node *children[K];
     trie_node *parent;
 };
@@ -58,12 +59,15 @@ void trie_destroy(trie *t) {
     free(t);
 }
 
-int get_id(trie *t, char *str) {
+int get_id(trie *t, char *str, int insert) {
     trie_node *n = t->root;
     for (int i = 0; str[i] != '\0'; i++) {
         char c = tolower(str[i]);
         int j = c - 'a';
         if (n->children[j] == NULL) {
+            if (!insert) {
+                return -100;
+            }
             trie_node *p = calloc(1, sizeof(trie_node));
             n->children[j] = p;
 
@@ -81,6 +85,10 @@ int get_id(trie *t, char *str) {
         }
         n = n->children[j];
     }
+    if (n->ending == 0 && !insert) {
+        return -100;
+    }
+    n->ending = 1;
     return n->id;
 }
 

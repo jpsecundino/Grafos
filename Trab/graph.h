@@ -28,7 +28,7 @@ graph *graph_create(int vertices);
     Retorno:
         - novo grafo criado
 */
-graph *graph_from_sequence(int *seq, int len);
+graph *graph_from_sequence(int *seq, int len, int end);
 
 /*      Destroi grafo.
     Parâmetros:
@@ -75,3 +75,5 @@ void graph_edge_remove(graph *g, int u, int v);
 node *graph_edge_list(graph *g, int u);
 
 int graph_vertex_count(graph *g);
+
+double graph_mean_weight(graph *g);

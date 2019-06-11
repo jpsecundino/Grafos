@@ -23,7 +23,7 @@ void trie_destroy(trie *t);
  * @param  *word: contains the word wich id will be search
  * @retval word's id
  */
-int get_id(trie *root, char *word);
+int get_id(trie *root, char *word, int insert);
 
 /**
  * @brief  Returns a word based on it's id
