@@ -1,0 +1,14 @@
+Welcome to Automatic Sentence Generator!
+In this program, you can generate sentences based on any static dictionary and in any set of words.
+You can check what your favourite writer would say if he/she had the specified set of words in mind.
+You also can use it in your cellphone as it complete your sentences based on your own personal dictionary.
+
+How to compile it?
+    Just go to the main.c file path in terminal and write 'Make' whitout the quotes.
+How to use it?
+    You only need to specify the name of the dictionary file, wich has to be in the same folder.
+    See the example below:
+        ./AutomaticSentenceGenerator myDictionary
+    OBS:
+        You can write a optional second argument, a double containing a value for the word penalty.
+        This argument will set a penalty for every new word found on the actual sentence. 

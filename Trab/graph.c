@@ -14,6 +14,10 @@ struct _graph {
 
 graph *graph_create(int vertices) {
     graph *g = calloc(1, sizeof(graph));
+    
+    if(g == NULL)
+        return NULL;
+    
     g->list = calloc(vertices, sizeof(node *));
     g->vertices = vertices;
     return g;

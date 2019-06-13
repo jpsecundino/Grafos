@@ -137,24 +137,32 @@ void get_sentence(char ***s, int *total_size){
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        printf("Entre o arquivo de dicionario como argumento.\n");
+        printf("Specify the dictionary file name at input: ./AutomaticSentenceGenerator <DictionaryFileName: string> <WordPenalty: double>\nThe last argument is optional\n");
         return 1;
     }
     if (argc >= 3) {
         new_word_penality = atof(argv[2]);
-        printf("Usando penalidade de adicionar palavras = %f\n", new_word_penality);
+        printf("Using word penalty as %f\n", new_word_penality);
     }
     FILE *f = fopen(argv[1], "r");
     if (f == NULL) {
-        printf("Falha ao ler arquivo.\n");
+        printf("Fail to open dicionary.\n");
         return 2;
     }
 
-    printf("Carregando arquivo.\n");
+
+    printf("\n\t┌─┐┬ ┬┌┬┐┌─┐┌┬┐┌─┐┌┬┐┬┌─┐  ┌─┐┌─┐┌┐┌┌┬┐┌─┐┌┐┌┌─┐┌─┐  ┌─┐┌─┐┌┐┌┌─┐┬─┐┌─┐┌┬┐┌─┐┬─┐\n");
+    printf("\t├─┤│ │ │ │ ││││├─┤ │ ││    └─┐├┤ │││ │ ├┤ ││││  ├┤   │ ┬├┤ │││├┤ ├┬┘├─┤ │ │ │├┬┘\n");
+    printf("\t┴ ┴└─┘ ┴ └─┘┴ ┴┴ ┴ ┴ ┴└─┘  └─┘└─┘┘└┘ ┴ └─┘┘└┘└─┘└─┘  └─┘└─┘┘└┘└─┘┴└─┴ ┴ ┴ └─┘┴└─\n");
+
+
+
+    printf("\nLoading dictionary..\n");
     trie *t = create_trie();
     graph *g = load_words(f, t);
-    printf("Arquivo carregado.\n");
-    printf("Digite as palavras para gerar uma frase. Para sair nao digite nada e aperte enter.\n");
+    printf("\nSuccess!\n\n");
+
+    printf("Write a set of words wich exists on dicionary. Your sentence will be build based on that.\n");
 
     fclose(f);
 
@@ -175,13 +183,13 @@ int main(int argc, char **argv) {
         for (int i = 0; i <= cnt; i++) {
             int v = i == cnt ? END : get_id(t, input[i], 0) + FIRST_WORD_ID; 
             if (v < 0) {
-                printf("A palavra '%s' nao existe no dicionario", input[i]);
+                printf("The word '%s' doesn't exists on dictionary", input[i]);
                 ok = 0;
                 break;
             }
             shortest_path(u, g, dist, parent);
             if (parent[v] == -1 && u != v) {
-                printf("Nao foi possivel formar uma frase");
+                printf("Impossible to build a sentence");
                 ok = 0;
                 break;
             }
@@ -218,6 +226,8 @@ int main(int argc, char **argv) {
             free(input[i]);
         }
         free(input);
+
+        printf("Write another set of words or press <ENTER> to quit\n");
     }
 
     trie_destroy(t);
