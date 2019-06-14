@@ -52,13 +52,7 @@ void graph_destroy(graph *g);
  */
 void graph_edge_add(graph *g, int u, int v, int w);
 
-/*      Retorna aresta entre dois nós.
-        - graph *g  : grafo que contém a aresta desejada
-        - int u     : primeiro nó
-        - int v     : segundo nó
-    Retorno:
-        - aresta entre os nós em questão
-*/
+
 /**
  * @brief  Retorna aresta entre dois nós.
  * @param  *g: grafo que contém a aresta desejada

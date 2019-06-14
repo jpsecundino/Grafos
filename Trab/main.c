@@ -24,7 +24,7 @@ void add(int **seq, int *cnt, int *len, int x) {
 }
 
 double weight(graph *g, int u, int v, int freq) {
-    return graph_mean_weight(g) / freq + 0.15;
+    return graph_mean_weight(g) / freq + new_word_penality;
 }
 
 void shortest_path(int v0, graph *g, double *dist, int *parent) {
