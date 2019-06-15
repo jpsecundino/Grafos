@@ -15,6 +15,9 @@
 
 double new_word_penality = 0.1;
 
+/**
+  * @brief Adds an element to the sentence sequence
+*/
 void add(int **seq, int *cnt, int *len, int x) {
     if (*cnt == *len) {
         *len = (*len) == 0 ? 1 : 2 * (*len);
@@ -27,6 +30,9 @@ double weight(graph *g, int u, int v, int freq) {
     return graph_mean_weight(g) / freq + new_word_penality;
 }
 
+/**
+ * @brief d'Esopo-Pope Algorithm implementation
+ */
 void shortest_path(int v0, graph *g, double *dist, int *parent) {
     int *set = malloc(graph_vertex_count(g) * sizeof(int));
     for (int i = 0; i < graph_vertex_count(g); i++) {
@@ -57,6 +63,13 @@ void shortest_path(int v0, graph *g, double *dist, int *parent) {
     free(set);
 }
 
+ /**
+  * @brief  Creates the graph from the dictionary
+  * @note The graph returned needs to be deallocated
+  * @param  *f: pointer to a file containing the dictionary
+  * @param  *t: pointer to the trie that will receive the words from f
+  * @retval pointer to a new Graph
+ */
 graph *load_words(FILE *f, trie *t) {
     int *seq = NULL;
     int cnt = 0, cap = 0;
@@ -95,7 +108,13 @@ graph *load_words(FILE *f, trie *t) {
     }
     return g;
 }
-
+ /**
+  * @brief  Reads the sequence of words given by the user
+  * @note   Needs to be deallocated after use
+  * @param  ***s: pointer to a memory location of a matrix that will contain the given words
+  * @param  *total_size: pointer to memory locations of the total size of matriz, initializated with 0
+  * @retval None
+ */
 void get_sentence(char ***s, int *total_size){
     char aux[1024];
     fgets(aux, 1024, stdin);
@@ -136,14 +155,19 @@ void get_sentence(char ***s, int *total_size){
 }
 
 int main(int argc, char **argv) {
+    //check for parameters
     if (argc < 2) {
         printf("Specify the dictionary file name at input: ./AutomaticSentenceGenerator <DictionaryFileName: string> <WordPenalty: double>\nThe last argument is optional\n");
         return 1;
     }
+    
+    //if the user specified the word penalty
     if (argc >= 3) {
         new_word_penality = atof(argv[2]);
         printf("Using word penalty as %f\n", new_word_penality);
     }
+
+    //open dictionary
     FILE *f = fopen(argv[1], "r");
     if (f == NULL) {
         printf("Fail to open dicionary.\n");
@@ -151,9 +175,10 @@ int main(int argc, char **argv) {
     }
 
     printf("\n\t┌─┐┬ ┬┌┬┐┌─┐┌┬┐┌─┐┌┬┐┬┌─┐  ┌─┐┌─┐┌┐┌┌┬┐┌─┐┌┐┌┌─┐┌─┐  ┌─┐┌─┐┌┐┌┌─┐┬─┐┌─┐┌┬┐┌─┐┬─┐\n");
-    printf("\t├─┤│ │ │ │ ││││├─┤ │ ││    └─┐├┤ │││ │ ├┤ ││││  ├┤   │ ┬├┤ │││├┤ ├┬┘├─┤ │ │ │├┬┘\n");
-    printf("\t┴ ┴└─┘ ┴ └─┘┴ ┴┴ ┴ ┴ ┴└─┘  └─┘└─┘┘└┘ ┴ └─┘┘└┘└─┘└─┘  └─┘└─┘┘└┘└─┘┴└─┴ ┴ ┴ └─┘┴└─\n");
+    printf(  "\t├─┤│ │ │ │ ││││├─┤ │ ││    └─┐├┤ │││ │ ├┤ ││││  ├┤   │ ┬├┤ │││├┤ ├┬┘├─┤ │ │ │├┬┘\n");
+    printf(  "\t┴ ┴└─┘ ┴ └─┘┴ ┴┴ ┴ ┴ ┴└─┘  └─┘└─┘┘└┘ ┴ └─┘┘└┘└─┘└─┘  └─┘└─┘┘└┘└─┘┴└─┴ ┴ ┴ └─┘┴└─\n");
 
+    //create graph from dictionary
     printf("\nLoading dictionary..\n");
     trie *t = create_trie();
     graph *g = load_words(f, t);
@@ -165,12 +190,15 @@ int main(int argc, char **argv) {
 
     double *dist = malloc(graph_vertex_count(g) * sizeof(double));
     int *parent = malloc(graph_vertex_count(g) * sizeof(int));
+    //principal routine
     while (1) {
         char **input = NULL;
         int cnt = 0;
+
         printf("Write some words -> ");
-        ;
+        //read input
         get_sentence(&input, &cnt);
+        
         if (cnt == 0) {
             break;
         }
@@ -186,12 +214,18 @@ int main(int argc, char **argv) {
                 ok = 0;
                 break;
             }
+
+            //find the shortest paths
             shortest_path(u, g, dist, parent);
+            
+            //no connection between words
             if (parent[v] == -1 && u != v) {
                 printf("Impossible to build a sentence");
                 ok = 0;
                 break;
             }
+
+            //add the words to a stack (to after read upside down the stack)
             u = v;
             node *stack = NULL;
             while (parent[v] != -1) {
@@ -207,7 +241,8 @@ int main(int argc, char **argv) {
                 deque_push_back(&output_head, &output_tail, word);
             }
         }
-         printf("Output Sentence -> ");
+        
+        printf("Output Sentence -> ");
         int first = 1;
         while (ok && output_head) {
             char *word = deque_pop_front(&output_head, &output_tail).pointer;
