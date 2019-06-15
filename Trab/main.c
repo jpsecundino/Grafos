@@ -150,12 +150,9 @@ int main(int argc, char **argv) {
         return 2;
     }
 
-
     printf("\n\t┌─┐┬ ┬┌┬┐┌─┐┌┬┐┌─┐┌┬┐┬┌─┐  ┌─┐┌─┐┌┐┌┌┬┐┌─┐┌┐┌┌─┐┌─┐  ┌─┐┌─┐┌┐┌┌─┐┬─┐┌─┐┌┬┐┌─┐┬─┐\n");
     printf("\t├─┤│ │ │ │ ││││├─┤ │ ││    └─┐├┤ │││ │ ├┤ ││││  ├┤   │ ┬├┤ │││├┤ ├┬┘├─┤ │ │ │├┬┘\n");
     printf("\t┴ ┴└─┘ ┴ └─┘┴ ┴┴ ┴ ┴ ┴└─┘  └─┘└─┘┘└┘ ┴ └─┘┘└┘└─┘└─┘  └─┘└─┘┘└┘└─┘┴└─┴ ┴ ┴ └─┘┴└─\n");
-
-
 
     printf("\nLoading dictionary..\n");
     trie *t = create_trie();
@@ -171,6 +168,8 @@ int main(int argc, char **argv) {
     while (1) {
         char **input = NULL;
         int cnt = 0;
+        printf("Write some words -> ");
+        ;
         get_sentence(&input, &cnt);
         if (cnt == 0) {
             break;
@@ -201,13 +200,14 @@ int main(int argc, char **argv) {
                 }
                 v = parent[v];
             }
+         
             while (stack) {
                 node_val word = list_val(stack);
                 stack = list_delete(stack, word);
                 deque_push_back(&output_head, &output_tail, word);
             }
         }
-
+         printf("Output Sentence -> ");
         int first = 1;
         while (ok && output_head) {
             char *word = deque_pop_front(&output_head, &output_tail).pointer;
@@ -227,7 +227,7 @@ int main(int argc, char **argv) {
         }
         free(input);
 
-        printf("Write another set of words or press <ENTER> to quit\n");
+        printf("\nWrite another set of words or press <ENTER> to quit\n");
     }
 
     trie_destroy(t);

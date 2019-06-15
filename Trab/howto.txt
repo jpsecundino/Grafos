@@ -23,3 +23,12 @@ Remember:
     A larger dictionary implies a better result! Enjoy and have fun \0/.
 
     We are not responsible for the content of the sentences written here.
+
+    3.1 Compilando o programa
+		Considerando que o usuário esteja no diretório do programa, basta que seja 		digitado o comando Makefile. Esse comando gerará um executável denominado 	“AutomaticSentenceGenerator”. 
+	3.2 Iniciando o programa
+		​
+	3.3 Escolhendo as palavras de entrada	
+	3.4 Mensagens de erro
+	3.5 Saindo do programa
+	

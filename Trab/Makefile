@@ -1,2 +1,2 @@
 all:
-	gcc *.c -o AutomaticSentenceGenerator
+	gcc *.c -o AutomaticSentenceGenerator.exec
